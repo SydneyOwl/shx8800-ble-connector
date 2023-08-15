@@ -1,5 +1,11 @@
 # README
 
+![go_version](https://img.shields.io/badge/Go-1.20.4-brightgreen?style=for-the-badge)
+
+[![downloads](https://img.shields.io/github/downloads/SydneyOwl/shx8800-ble-connector/total)](https://github.com/SydneyOwl/shx8800-ble-connector/releases?style=for-the-badge)
+[![downloads@latest](https://img.shields.io/github/downloads/SydneyOwl/shx8800-ble-connector/latest/total)](https://github.com/SydneyOwl/shx8800-ble-connector/releases/latest?style=for-the-badge)
+![](https://img.shields.io/github/v/tag/sydneyowl/shx8800-ble-connector?label=version&style=flat-square?style=for-the-badge)
+
 ![IMG_20230815_083605](./md_assets/readme/IMG_20230815_083605.jpg)
 
 ## 简介
