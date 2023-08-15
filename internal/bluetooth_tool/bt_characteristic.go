@@ -24,8 +24,6 @@ func (btc *BTCharacteristic) SendDataToCheck(data []byte) error {
 	return err
 }
 func (btc *BTCharacteristic) SendDataToRW(data []byte) error {
-	BtMutex.Lock()
 	_, err := btc.RWCharacteristic.Write(data)
-	BtMutex.Unlock()
 	return err
 }

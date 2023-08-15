@@ -18,6 +18,7 @@ func StartAndRun() {
 	ports, err := serial_tool.ScanPort()
 	if err != nil {
 		slog.Fatalf("无法检测端口：%v", err)
+		_, _ = fmt.Scanln()
 		return
 	}
 	stdout_fmt.PrintAllPorts(ports)
@@ -34,6 +35,7 @@ func StartAndRun() {
 	err = serial_tool.ConnPort(targetPort)
 	if err != nil {
 		slog.Fatalf("无法连接端口：%v", err)
+		_, _ = fmt.Scanln()
 		return
 	}
 	slog.Info("端口连接成功！")
@@ -43,10 +45,12 @@ func StartAndRun() {
 	list, err := bluetooth_tool.GetAvailableBtDevList(bluetooth_tool.SHX8800Filter)
 	if err != nil {
 		slog.Fatalf("扫描失败: %v", err)
+		_, _ = fmt.Scanln()
 		return
 	}
 	if len(list) == 0 {
 		slog.Fatal("未找到SHX8800设备！")
+		_, _ = fmt.Scanln()
 		return
 	}
 	stdout_fmt.PrintAvailableShxDevices(list)
@@ -65,6 +69,7 @@ func StartAndRun() {
 	conn, err := bluetooth_tool.ConnectByMac(deviceSHX.Address)
 	if err != nil {
 		slog.Fatalf("无法连接设备")
+		_, _ = fmt.Scanln()
 		return
 	}
 	slog.Info("连接成功！")
@@ -72,6 +77,7 @@ func StartAndRun() {
 	services, err := conn.DiscoverServices(nil)
 	if err != nil {
 		slog.Fatalf("无法发现服务")
+		_, _ = fmt.Scanln()
 		return
 	}
 	slog.Trace(services)
@@ -82,6 +88,7 @@ func StartAndRun() {
 		chs, err := service.DiscoverCharacteristics(nil)
 		if err != nil {
 			slog.Fatalf("无法发现特征")
+			_, _ = fmt.Scanln()
 			return
 		}
 		slog.Trace(chs)
@@ -110,6 +117,7 @@ func StartAndRun() {
 	}
 	if checkCharacteristic == nil || rwCharacteristic == nil {
 		slog.Fatalf("无法获取设备通道")
+		_, _ = fmt.Scanln()
 		return
 	}
 	bluetooth_tool.CurrentDevice = &bluetooth_tool.BTCharacteristic{
@@ -126,7 +134,9 @@ func StartAndRun() {
 	go serial_tool.SerialDataProvider(ctx, serialChan)
 	go serial_tool.SerialDataWriter(ctx, btReplyChan)
 	slog.Noticef("初始化完成！现在可以连接写频软件了！输入任意字符退出软件！")
-	fmt.Println("如果遇到读频卡在4%，请点击取消后重新读频即可！")
+	slog.Noticef("如果遇到读频卡在4%，请点击取消后重新读频即可！手台写频完成重启后请关闭软件重新打开！")
+	slog.Noticef("如果一直写频失败，请使用写频线写入")
+	slog.Noticef("------------------------------")
 	_, _ = fmt.Scanln()
 	// Clean up...
 	cancel()

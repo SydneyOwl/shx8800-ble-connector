@@ -16,10 +16,8 @@ func BTWriter(ctx context.Context, recv <-chan []byte) {
 		default:
 			data := <-recv
 			//slog.Warn("writ")
-			//BtMutex.Lock()
 			_ = CurrentDevice.SendDataToRW(data)
-			//BtMutex.Unlock()
-			time.Sleep(time.Microsecond * 1)
+			time.Sleep(time.Microsecond * 10)
 		}
 	}
 }
