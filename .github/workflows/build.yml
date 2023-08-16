@@ -28,6 +28,14 @@ jobs:
         with:
           architecture: i686
 
+      - name: Run BuildTest
+        uses: goreleaser/goreleaser-action@v4
+        if: startsWith(github.ref, 'refs/heads/')
+        with:
+          distribution: goreleaser
+          version: latest
+          args: release --skip-publish --snapshot
+
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v4
         if: startsWith(github.ref, 'refs/tags/')

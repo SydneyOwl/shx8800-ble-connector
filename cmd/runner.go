@@ -3,12 +3,13 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"strings"
+	"time"
+
 	"github.com/gookit/slog"
 	"github.com/sydneyowl/shx8800-ble-connector/internal/bluetooth_tool"
 	"github.com/sydneyowl/shx8800-ble-connector/internal/serial_tool"
 	"github.com/sydneyowl/shx8800-ble-connector/internal/stdout_fmt"
-	"strings"
-	"time"
 	"tinygo.org/x/bluetooth"
 )
 
@@ -99,24 +100,28 @@ func StartAndRun() {
 		}
 		slog.Trace(chs)
 		for i, ch := range chs {
-			/*if strings.Contains(ch.String(), bluetooth_tool.BATTERY_CHARACTERISTIC_UUID) {
-				_, err = ch.Read(battery)
-				slog.Noticef("设备电量：%x%%", battery[0])
-			} else*/if strings.Contains(ch.String(), bluetooth_tool.FIRMWARE_REVISION_CHARACTERISTIC_UUID) {
+			if strings.Contains(ch.String(), bluetooth_tool.FIRMWARE_REVISION_CHARACTERISTIC_UUID) {
 				_, _ = ch.Read(firmware)
 				slog.Noticef("固件版本：%s", string(firmware))
-			} else if strings.Contains(ch.String(), bluetooth_tool.MANUFACTURER_CHARACTERISTIC_UUID) {
+				continue
+			}
+			if strings.Contains(ch.String(), bluetooth_tool.MANUFACTURER_CHARACTERISTIC_UUID) {
 				_, _ = ch.Read(manufacturer)
 				slog.Noticef("生产产商：%s", string(manufacturer))
-			} else if strings.Contains(ch.String(), bluetooth_tool.MODEL_NUMBER_CHARACTERISTIC_UUID) {
+				continue
+			}
+			if strings.Contains(ch.String(), bluetooth_tool.MODEL_NUMBER_CHARACTERISTIC_UUID) {
 				_, _ = ch.Read(model)
 				slog.Noticef("设备型号：%s", string(model))
-			} else if strings.Contains(ch.String(), bluetooth_tool.CHECK_CHARACTERISTIC_UUID) {
+				continue
+			}
+			if strings.Contains(ch.String(), bluetooth_tool.CHECK_CHARACTERISTIC_UUID) {
 				checkCharacteristic = &chs[i]
-			} else if strings.Contains(ch.String(), bluetooth_tool.RW_CHARACTERISTIC_UUID) {
+				continue
+			}
+			if strings.Contains(ch.String(), bluetooth_tool.RW_CHARACTERISTIC_UUID) {
 				rwCharacteristic = &chs[i]
-			} else {
-
+				continue
 			}
 			time.Sleep(time.Millisecond * 100)
 		}
@@ -139,9 +144,9 @@ func StartAndRun() {
 	go bluetooth_tool.BTWriter(ctx, serialChan)
 	go serial_tool.SerialDataProvider(ctx, serialChan)
 	go serial_tool.SerialDataWriter(ctx, btReplyChan)
-	slog.Noticef("初始化完成！现在可以连接写频软件了！输入任意字符退出软件！")
-	slog.Noticef("如果遇到读频卡在4%，请点击取消后重新读频即可！手台写频完成重启后请关闭软件重新打开！")
-	slog.Noticef("如果一直写频失败，请使用写频线写入")
+	slog.Notice("初始化完成！现在可以连接写频软件了！输入任意字符退出软件！")
+	slog.Notice("如果遇到读频卡在4%，请点击取消后重新读频即可！手台写频完成重启后请关闭软件重新打开！")
+	slog.Notice("如果一直写频失败，请使用写频线写入")
 	slog.Noticef("------------------------------")
 	_, _ = fmt.Scanln()
 	// Clean up...
