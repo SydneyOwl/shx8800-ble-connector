@@ -1,7 +1,9 @@
 # README
 
 ![go_version](https://img.shields.io/badge/Go-1.20.4-brightgreen?style=for-the-badge)
+![GitHub Workflow Status (with branch)](https://img.shields.io/github/actions/workflow/status/SydneyOwl/shx8800-ble-connector/build.yml?style=for-the-badge)
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/sydneyowl/shx8800-ble-connector)](https://goreportcard.com/report/github.com/sydneyowl/shx8800-ble-connector)
 [![downloads](https://img.shields.io/github/downloads/SydneyOwl/shx8800-ble-connector/total)](https://github.com/SydneyOwl/shx8800-ble-connector/releases?style=for-the-badge)
 [![downloads@latest](https://img.shields.io/github/downloads/SydneyOwl/shx8800-ble-connector/latest/total)](https://github.com/SydneyOwl/shx8800-ble-connector/releases/latest?style=for-the-badge)
 ![](https://img.shields.io/github/v/tag/sydneyowl/shx8800-ble-connector?label=version&style=flat-square?style=for-the-badge)
@@ -18,7 +20,7 @@
 
 ## 使用方法
 
-**警告：使用前做好备份工作！绝对不要将此软件用于除读写频之外的功能（如系统升级）！对使用此软件产生的一切后果作者不任何责任！**
+**警告：使用前做好备份工作！绝对不要将此软件用于除读写频之外的功能（如系统升级）！对使用此软件产生的一切后果作者不负任何责任！**
 
 ### 前置工作
 

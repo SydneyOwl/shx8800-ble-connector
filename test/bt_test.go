@@ -13,7 +13,8 @@ func TestBtScanner(t *testing.T) {
 	logger.InitLog(false, false)
 	list, err := bluetooth_tool.GetAvailableBtDevList(bluetooth_tool.SHX8800Filter)
 	if err != nil {
-		slog.Fatal(err)
+		slog.Fatalf("出错：%v", err)
+		_, _ = fmt.Scanln()
 	}
 	if len(list) == 0 {
 		slog.Warn("未找到SHX8800设备！")

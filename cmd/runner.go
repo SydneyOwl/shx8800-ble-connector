@@ -13,6 +13,12 @@ import (
 )
 
 func StartAndRun() {
+	defer func() {
+		if err := recover(); err != nil {
+			slog.Fatalf("出现异常：%v", err)
+			_, _ = fmt.Scanln()
+		}
+	}()
 	// port
 	slog.Info("搜索端口...")
 	ports, err := serial_tool.ScanPort()
