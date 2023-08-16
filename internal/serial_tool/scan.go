@@ -60,7 +60,7 @@ func SerialDataProvider(ctx context.Context, serRecvChan chan<- []byte) {
 	}
 }
 
-func SerialDataWriter(ctx context.Context, btChan <-chan []byte) {
+func SerialDataWriter(ctx context.Context, btChan <-chan []byte, repErr chan<- error) {
 	for {
 		select {
 		case <-ctx.Done():
@@ -68,7 +68,11 @@ func SerialDataWriter(ctx context.Context, btChan <-chan []byte) {
 			return
 		default:
 			res := <-btChan
-			_, _ = selConn.Write(res)
+			_, err := selConn.Write(res)
+			if err != nil {
+				repErr <- err
+				return
+			}
 			time.Sleep(time.Millisecond * 1)
 		}
 	}

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/gookit/slog"
@@ -13,12 +14,24 @@ import (
 	"tinygo.org/x/bluetooth"
 )
 
+var cancelFunc context.CancelFunc
+var once sync.Once
+var btConn *bluetooth.Device
+
+func doShutup() {
+	// Clean up...
+	cancelFunc()
+	bluetooth_tool.DisconnectDevice(btConn)
+	serial_tool.ShutPort()
+}
+
 func StartAndRun() {
 	defer func() {
 		if err := recover(); err != nil {
 			slog.Fatalf("出现异常：%v", err)
 			_, _ = fmt.Scanln()
 		}
+		once.Do(doShutup)
 	}()
 	// port
 	slog.Info("搜索端口...")
@@ -72,8 +85,10 @@ func StartAndRun() {
 	}
 	deviceSHX := list[deviceNo-1]
 	slog.Info("连接设备...")
-	bluetooth_tool.SetHandler(bluetooth_tool.DisconnectHandler)
+	//windows不可用
+	//bluetooth_tool.SetHandler(bluetooth_tool.DisconnectHandler)
 	conn, err := bluetooth_tool.ConnectByMac(deviceSHX.Address)
+	btConn = conn
 	if err != nil {
 		slog.Fatalf("无法连接设备")
 		_, _ = fmt.Scanln()
@@ -137,20 +152,24 @@ func StartAndRun() {
 	}
 	time.Sleep(time.Microsecond * 100)
 	btReplyChan := make(chan []byte, 5)
-	bluetooth_tool.CurrentDevice.SetReadWriteReceiveHandler(bluetooth_tool.RWRecvHandler, btReplyChan)
 	serialChan := make(chan []byte, 10)
+	errChan := make(chan error, 3)
+	bluetooth_tool.CurrentDevice.SetReadWriteReceiveHandler(bluetooth_tool.RWRecvHandler, btReplyChan)
 	time.Sleep(time.Millisecond * 100)
 	ctx, cancel := context.WithCancel(context.Background())
-	go bluetooth_tool.BTWriter(ctx, serialChan)
+	cancelFunc = cancel
+	go bluetooth_tool.BTWriter(ctx, serialChan, errChan)
 	go serial_tool.SerialDataProvider(ctx, serialChan)
-	go serial_tool.SerialDataWriter(ctx, btReplyChan)
+	go serial_tool.SerialDataWriter(ctx, btReplyChan, errChan)
 	slog.Notice("初始化完成！现在可以连接写频软件了！输入任意字符退出软件！")
 	slog.Notice("如果遇到读频卡在4%，请点击取消后重新读频即可！手台写频完成重启后请关闭软件重新打开！")
 	slog.Notice("如果一直写频失败，请使用写频线写入")
 	slog.Noticef("------------------------------")
+	go func() {
+		err := <-errChan
+		slog.Warnf("出现异常：%v，如果对讲机写频完成后重启了或者对讲机已经被关闭，您可以忽略提示，按下两次回车键以退出", err)
+		_, _ = fmt.Scanln()
+		once.Do(doShutup)
+	}()
 	_, _ = fmt.Scanln()
-	// Clean up...
-	cancel()
-	bluetooth_tool.DisconnectDevice(conn)
-	serial_tool.ShutPort()
 }
