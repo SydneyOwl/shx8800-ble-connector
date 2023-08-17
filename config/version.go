@@ -1,5 +1,7 @@
 package config
 
 var (
-	VER = "0.0.1"
+	VER       = "Unknown"
+	COMMIT    = "Unknown"
+	BUILDTIME = "Unknown"
 )

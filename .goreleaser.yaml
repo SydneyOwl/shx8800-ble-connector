@@ -11,6 +11,10 @@ builds:
           {{- if eq .Arch "amd64" }}CC=x86_64-w64-mingw32-gcc{{- end }}
           {{- if eq .Arch "386" }}CC=i686-w64-mingw32-gcc{{- end }}
         {{- end }}
+    ldflags:
+      - -X 'github.com/sydneyowl/shx8800-ble-connector/config.VER={{.Tag}}'
+      - -X 'github.com/sydneyowl/shx8800-ble-connector/config.COMMIT={{.Commit}}'
+      - -X 'github.com/sydneyowl/shx8800-ble-connector/config.BUILDTIME={{.Date}}'
     goos:
       - windows
     goarch:
