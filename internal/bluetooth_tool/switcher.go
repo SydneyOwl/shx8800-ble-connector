@@ -28,7 +28,7 @@ func BTWriter(ctx context.Context, recv <-chan []byte, repErr chan<- error) {
 				repErr <- exceptions.TransferDone
 				return
 			}
-			time.Sleep(time.Microsecond * 1)
+			time.Sleep(time.Microsecond * 5)
 		}
 	}
 }
