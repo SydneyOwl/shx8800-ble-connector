@@ -1,8 +1,10 @@
 package bluetooth_tool
 
 import (
+	"bytes"
 	"context"
 	"github.com/gookit/slog"
+	"github.com/sydneyowl/shx8800-ble-connector/pkg/exceptions"
 	"time"
 )
 
@@ -21,7 +23,12 @@ func BTWriter(ctx context.Context, recv <-chan []byte, repErr chan<- error) {
 				repErr <- err
 				return
 			}
-			time.Sleep(time.Microsecond * 10)
+			//遇到最后一个帧对讲机将重启
+			if bytes.Equal(FINAL_DATA_STARTER, data[0:3]) {
+				repErr <- exceptions.TransferDone
+				return
+			}
+			time.Sleep(time.Microsecond * 1)
 		}
 	}
 }
