@@ -173,6 +173,7 @@ func StartAndRun() {
 			slog.Noticef("传输完成！对讲机将重启，按下回车键退出...")
 		} else {
 			slog.Warnf("出现异常：%v，如果对讲机写频完成后重启了或者对讲机已经被关闭，您可以忽略提示，按下回车键以退出", err)
+			once.Do(doShutup)
 		}
 	}()
 	_, _ = fmt.Scanln()
