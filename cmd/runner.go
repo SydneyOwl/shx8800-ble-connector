@@ -4,15 +4,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/sydneyowl/shx8800-ble-connector/pkg/exceptions"
-	"strings"
-	"sync"
-	"time"
-
 	"github.com/gookit/slog"
 	"github.com/sydneyowl/shx8800-ble-connector/internal/bluetooth_tool"
 	"github.com/sydneyowl/shx8800-ble-connector/internal/serial_tool"
 	"github.com/sydneyowl/shx8800-ble-connector/internal/stdout_fmt"
+	"github.com/sydneyowl/shx8800-ble-connector/pkg/exceptions"
+	"os"
+	"strings"
+	"sync"
 	"tinygo.org/x/bluetooth"
 )
 
@@ -41,7 +40,7 @@ func StartAndRun() {
 	if err != nil {
 		slog.Fatalf("无法检测端口：%v", err)
 		_, _ = fmt.Scanln()
-		return
+		os.Exit(-1)
 	}
 	stdout_fmt.PrintAllPorts(ports)
 	fmt.Println()
@@ -58,7 +57,7 @@ func StartAndRun() {
 	if err != nil {
 		slog.Fatalf("无法连接端口：%v", err)
 		_, _ = fmt.Scanln()
-		return
+		os.Exit(-1)
 	}
 	slog.Info("端口连接成功！")
 
@@ -68,12 +67,12 @@ func StartAndRun() {
 	if err != nil {
 		slog.Fatalf("扫描失败: %v", err)
 		_, _ = fmt.Scanln()
-		return
+		os.Exit(-1)
 	}
 	if len(list) == 0 {
 		slog.Fatal("未找到SHX8800设备！")
 		_, _ = fmt.Scanln()
-		return
+		os.Exit(-1)
 	}
 	stdout_fmt.PrintAvailableShxDevices(list)
 	var deviceNo int
@@ -94,7 +93,7 @@ func StartAndRun() {
 	if err != nil {
 		slog.Fatalf("无法连接设备")
 		_, _ = fmt.Scanln()
-		return
+		os.Exit(-1)
 	}
 	slog.Info("连接成功！")
 	slog.Debug("正在发现服务...")
@@ -102,7 +101,7 @@ func StartAndRun() {
 	if err != nil {
 		slog.Fatalf("无法发现服务")
 		_, _ = fmt.Scanln()
-		return
+		os.Exit(-1)
 	}
 	slog.Trace(services)
 	slog.Debug("正在发现特征...")
@@ -113,7 +112,7 @@ func StartAndRun() {
 		if err != nil {
 			slog.Fatalf("无法发现特征")
 			_, _ = fmt.Scanln()
-			return
+			os.Exit(-1)
 		}
 		slog.Trace(chs)
 		for i, ch := range chs {
@@ -140,24 +139,21 @@ func StartAndRun() {
 				rwCharacteristic = &chs[i]
 				continue
 			}
-			time.Sleep(time.Millisecond * 100)
 		}
 	}
 	if checkCharacteristic == nil || rwCharacteristic == nil {
 		slog.Fatalf("无法获取设备通道")
 		_, _ = fmt.Scanln()
-		return
+		os.Exit(-1)
 	}
 	bluetooth_tool.CurrentDevice = &bluetooth_tool.BTCharacteristic{
 		CheckCharacteristic: checkCharacteristic, //暂时No
 		RWCharacteristic:    rwCharacteristic,
 	}
-	time.Sleep(time.Microsecond * 100)
 	btReplyChan := make(chan []byte, 5)
 	serialChan := make(chan []byte, 10)
 	errChan := make(chan error, 3)
 	bluetooth_tool.CurrentDevice.SetReadWriteReceiveHandler(bluetooth_tool.RWRecvHandler, btReplyChan)
-	time.Sleep(time.Millisecond * 100)
 	ctx, cancel := context.WithCancel(context.Background())
 	cancelFunc = cancel
 	go bluetooth_tool.BTWriter(ctx, serialChan, errChan)

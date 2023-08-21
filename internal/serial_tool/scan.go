@@ -44,7 +44,6 @@ func SerialDataProvider(ctx context.Context, serRecvChan chan<- []byte) {
 				// 即使超时也会返回nil
 				//if err != nil {
 				if lens == 0 {
-					time.Sleep(time.Millisecond * 1)
 					continue
 				}
 				data = append(data, b[:lens]...)
@@ -73,7 +72,6 @@ func SerialDataWriter(ctx context.Context, btChan <-chan []byte, repErr chan<- e
 				repErr <- err
 				return
 			}
-			time.Sleep(time.Millisecond * 1)
 		}
 	}
 }

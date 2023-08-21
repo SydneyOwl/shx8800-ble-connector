@@ -5,7 +5,6 @@ import (
 	"context"
 	"github.com/gookit/slog"
 	"github.com/sydneyowl/shx8800-ble-connector/pkg/exceptions"
-	"time"
 )
 
 // 串口数据写蓝牙
@@ -28,7 +27,6 @@ func BTWriter(ctx context.Context, recv <-chan []byte, repErr chan<- error) {
 				repErr <- exceptions.TransferDone
 				return
 			}
-			time.Sleep(time.Microsecond * 5)
 		}
 	}
 }
