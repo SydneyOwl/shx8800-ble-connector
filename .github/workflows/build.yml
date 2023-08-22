@@ -23,25 +23,12 @@ jobs:
       - uses: bwoodsend/setup-winlibs-action@v1
         id: winlibs-64
 
-      - uses: bwoodsend/setup-winlibs-action@v1
-        id: winlibs-32
-        with:
-          architecture: i686
+      - name: Run Build
+        run: .github\workflows\build.bat
 
-      - name: Run BuildTest
-        uses: goreleaser/goreleaser-action@v4
-        if: startsWith(github.ref, 'refs/heads/')
-        with:
-          distribution: goreleaser
-          version: latest
-          args: release --skip-publish --snapshot
-
-      - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v4
+      - name: Run Release
+        uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          distribution: goreleaser
-          version: latest
-          args: release --clean
-        env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+          files: tmp/*
+          token: ${{ secrets.TOKEN }}

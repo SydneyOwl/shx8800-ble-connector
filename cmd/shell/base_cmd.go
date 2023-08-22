@@ -1,10 +1,11 @@
-package cmd
+package main
 
 import (
 	"fmt"
 	"github.com/spf13/cobra"
 	"github.com/sydneyowl/shx8800-ble-connector/config"
 	"github.com/sydneyowl/shx8800-ble-connector/pkg/logger"
+	"os"
 )
 
 var (
@@ -38,4 +39,12 @@ func init() {
 	BaseCmd.PersistentFlags().BoolVar(&PrintVersion, "version", false, "Print Version")
 	BaseCmd.PersistentFlags().BoolVar(&Verbose, "verbose", false, "Print Debug Level logs")
 	BaseCmd.PersistentFlags().BoolVar(&Vverbose, "vverbose", false, "Print Debug/Trace Level logs")
+}
+
+func main() {
+	cobra.MousetrapHelpText = ""
+	if err := BaseCmd.Execute(); err != nil {
+		fmt.Printf("程序无法启动: %v", err)
+		os.Exit(-1)
+	}
 }

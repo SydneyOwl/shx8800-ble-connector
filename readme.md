@@ -32,13 +32,19 @@
 
 ### 手动编译
 
-熟悉go的朋友们可以选择从源码编译。
-
-直接go mod tidy然后go build即可。需要gcc支持。
+熟悉go的朋友们可以选择从源码编译。分为图形界面和命令行版本，编译指令见.github/workflows/build.bat
 
 ### 直接使用
 
-直接从releases下载对应版本的软件，双击运行。
+直接从releases下载对应版本的软件.双击运行即可
+
+shx8800-ble-connector_windows_amd64.exe --------命令行版本
+
+![img.png](md_assets/readme/cmd.png)
+
+shx8800-ble-connector-with-gui_windows_amd64.exe --------图形版本
+
+![img.png](md_assets/readme/img.png)
 
 按照提示，将本软件连接到COM1端口，写频工具连接到COM2即可。
 
