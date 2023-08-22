@@ -32,31 +32,34 @@ func ConnPort(portName string) error {
 func SerialDataProvider(ctx context.Context, serRecvChan chan<- []byte) {
 	first := false
 	for {
-		select {
-		case <-ctx.Done():
-			slog.Debug("Goroutine SDPR exited successfully!")
-			return
-		default:
-			var data []byte
-			for {
-				b := make([]byte, 1024)
-				lens, _ := selConn.Read(b)
-				// 即使超时也会返回nil
-				//if err != nil {
-				if lens == 0 {
-					continue
-				}
-				data = append(data, b[:lens]...)
+
+		var data []byte
+		for {
+			b := make([]byte, 1024)
+			select {
+			case <-ctx.Done():
+				slog.Debug("Goroutine SDPR exited successfully!")
+				return
+			default:
 				break
-				//}
 			}
-			if !first {
-				first = !first
-				slog.Info("软件已连接！")
+			lens, _ := selConn.Read(b)
+			// 即使超时也会返回nil
+			//if err != nil {
+			if lens == 0 {
+				continue
 			}
-			serRecvChan <- data
+			data = append(data, b[:lens]...)
+			break
+			//}
 		}
+		if !first {
+			first = !first
+			slog.Info("软件已连接！")
+		}
+		serRecvChan <- data
 	}
+
 }
 
 func SerialDataWriter(ctx context.Context, btChan <-chan []byte, repErr chan<- error) {
@@ -65,8 +68,7 @@ func SerialDataWriter(ctx context.Context, btChan <-chan []byte, repErr chan<- e
 		case <-ctx.Done():
 			slog.Debug("Goroutine SDWE exited successfully!")
 			return
-		default:
-			res := <-btChan
+		case res := <-btChan:
 			_, err := selConn.Write(res)
 			if err != nil {
 				repErr <- err

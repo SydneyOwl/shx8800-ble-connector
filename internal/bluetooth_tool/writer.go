@@ -14,8 +14,7 @@ func BTWriter(ctx context.Context, recv <-chan []byte, repErr chan<- error) {
 		case <-ctx.Done():
 			slog.Debug("Goroutine BTWR exited successfully!")
 			return
-		default:
-			data := <-recv
+		case data := <-recv:
 			//slog.Warn("writ")
 			err := CurrentDevice.SendDataToRW(data)
 			if err != nil {
