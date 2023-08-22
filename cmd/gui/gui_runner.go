@@ -29,11 +29,6 @@ var scanStatus *ui.Label
 var canceler context.CancelFunc
 var globalDevList = make(map[string]bluetooth.ScanResult, 0)
 
-var btrx *ui.Label
-var bttx *ui.Label
-var serx *ui.Label
-var setx *ui.Label
-
 var checkCharacteristic, rwCharacteristic *bluetooth.DeviceCharacteristic = nil, nil
 
 func contains(elems []string, v string) bool {
@@ -74,21 +69,6 @@ func makeBasicControlsPage() ui.Control {
 	connButton = ui.NewButton("开始连接")
 	startBox.Append(connButton, false)
 	butAndChoices.Append(startBox, false)
-	lightBox := ui.NewVerticalBox()
-	box_upper := ui.NewVerticalBox()
-	btrx = ui.NewLabel("↓bt_rx")
-	bttx = ui.NewLabel("↑bt_tx")
-	box_upper.Append(btrx, false)
-	box_upper.Append(bttx, false)
-	box_upper.Append(ui.NewHorizontalSeparator(), false)
-	box_sup := ui.NewVerticalBox()
-	serx = ui.NewLabel("↓serial_rx")
-	setx = ui.NewLabel("↑serial_tx")
-	box_sup.Append(serx, false)
-	box_sup.Append(setx, false)
-	lightBox.Append(box_upper, false)
-	lightBox.Append(box_sup, false)
-	butAndChoices.Append(lightBox, false)
 	pgbar := ui.NewVerticalBox()
 	scanStatus = ui.NewLabel("等待扫描...")
 	pgbar.Append(scanStatus, false)
@@ -263,10 +243,10 @@ func updateBtConnStat(addr bluetooth.Address, ctx context.Context) {
 	btReplyChan := make(chan []byte, 5)
 	serialChan := make(chan []byte, 10)
 	errChan := make(chan error, 3)
-	bluetooth_tool.CurrentDevice.SetGuiReadWriteReceiveHandler(bluetooth_tool.GUIRWRecvHandler, btReplyChan, btrx)
-	go bluetooth_tool.GuiBTWriter(ctx, serialChan, errChan, bttx)
-	go serial_tool.GuiSerialDataProvider(ctx, serialChan, serx)
-	go serial_tool.GuiSerialDataWriter(ctx, btReplyChan, errChan, setx)
+	bluetooth_tool.CurrentDevice.SetReadWriteReceiveHandler(bluetooth_tool.RWRecvHandler, btReplyChan)
+	go bluetooth_tool.BTWriter(ctx, serialChan, errChan)
+	go serial_tool.SerialDataProvider(ctx, serialChan)
+	go serial_tool.SerialDataWriter(ctx, btReplyChan, errChan)
 	addLog("初始化完成！现在可以连接写频软件了！")
 	addLog("如果遇到读频卡在4%，请点击取消后重新读频即可！\n手台写频完成重启后请重新连接！")
 	addLog("如果一直写频失败，请使用写频线写入")

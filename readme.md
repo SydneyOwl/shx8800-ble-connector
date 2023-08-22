@@ -40,11 +40,11 @@
 
 shx8800-ble-connector_windows_amd64.exe --------命令行版本
 
-![img.png](md_assets/readme/cmd.png)
+![img.png](md_assets/readme/cmd.gif)
 
 shx8800-ble-connector-with-gui_windows_amd64.exe --------图形版本
 
-![img.png](md_assets/readme/img.png)
+![img.png](md_assets/readme/gui.gif)
 
 按照提示，将本软件连接到COM1端口，写频工具连接到COM2即可。
 

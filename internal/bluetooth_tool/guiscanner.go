@@ -3,7 +3,6 @@
 package bluetooth_tool
 
 import (
-	"github.com/andlabs/ui"
 	"github.com/gookit/slog"
 	"time"
 	"tinygo.org/x/bluetooth"
@@ -50,15 +49,4 @@ func ConnectByMacNoBlock(mac bluetooth.Address, connChan chan *bluetooth.Device)
 		return
 	}
 	connChan <- dev
-}
-
-func GUIRWRecvHandler(recvChan chan<- []byte, label *ui.Label) func(c []byte) {
-	return func(c []byte) {
-		if label.Visible() {
-			label.Hide()
-		} else {
-			label.Show()
-		}
-		recvChan <- c
-	}
 }
