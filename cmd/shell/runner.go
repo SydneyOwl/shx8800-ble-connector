@@ -153,10 +153,10 @@ func StartAndRun() {
 	btReplyChan := make(chan []byte, 5)
 	serialChan := make(chan []byte, 10)
 	errChan := make(chan error, 3)
-	bluetooth_tool.CurrentDevice.SetReadWriteReceiveHandler(bluetooth_tool.RWRecvHandler, btReplyChan)
+	bluetooth_tool.CurrentDevice.SetReadWriteReceiveHandler(bluetooth_tool.RWRecvHandler, btReplyChan, nil)
 	ctx, cancel := context.WithCancel(context.Background())
 	cancelFunc = cancel
-	go bluetooth_tool.BTWriter(ctx, serialChan, errChan)
+	go bluetooth_tool.BTWriter(ctx, serialChan, errChan, nil)
 	go serial_tool.SerialDataProvider(ctx, serialChan)
 	go serial_tool.SerialDataWriter(ctx, btReplyChan, errChan)
 	slog.Notice("初始化完成！现在可以连接写频软件了！输入任意字符退出软件！")

@@ -8,13 +8,16 @@ import (
 )
 
 // 串口数据写蓝牙
-func BTWriter(ctx context.Context, recv <-chan []byte, repErr chan<- error) {
+func BTWriter(ctx context.Context, recv <-chan []byte, repErr chan<- error, btIn chan<- struct{}) {
 	for {
 		select {
 		case <-ctx.Done():
 			slog.Debug("Goroutine BTWR exited successfully!")
 			return
 		case data := <-recv:
+			if btIn != nil {
+				btIn <- struct{}{}
+			}
 			//slog.Warn("writ")
 			err := CurrentDevice.SendDataToRW(data)
 			if err != nil {

@@ -18,23 +18,23 @@ type BTCharacteristic struct {
 }
 
 func (btc *BTCharacteristic) SetCheckReceiveHandler(handler RecvHandler, recvChan chan<- []byte) {
-	err := sem.Acquire(ctx, 1)
-	if err != nil {
-		return
-	}
-	defer sem.Release(1)
-	btc.CheckRecvHandler = handler
-	_ = btc.CheckCharacteristic.EnableNotifications(handler(recvChan))
+	//err := sem.Acquire(ctx, 1)
+	//if err != nil {
+	//	return
+	//}
+	//defer sem.Release(1)
+	//btc.CheckRecvHandler = handler
+	//_ = btc.CheckCharacteristic.EnableNotifications(handler(recvChan))
 }
 
-func (btc *BTCharacteristic) SetReadWriteReceiveHandler(handler RecvHandler, recvChan chan<- []byte) {
+func (btc *BTCharacteristic) SetReadWriteReceiveHandler(handler RecvHandler, recvChan chan<- []byte, btIn chan<- struct{}) {
 	err := sem.Acquire(ctx, 1)
 	if err != nil {
 		return
 	}
 	defer sem.Release(1)
 	btc.RWRecvHandler = handler
-	_ = btc.RWCharacteristic.EnableNotifications(handler(recvChan))
+	_ = btc.RWCharacteristic.EnableNotifications(handler(recvChan, btIn))
 }
 func (btc *BTCharacteristic) SendDataToCheck(data []byte) error {
 	err := sem.Acquire(ctx, 1)

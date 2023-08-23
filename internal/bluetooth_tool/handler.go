@@ -6,15 +6,18 @@ import (
 	"tinygo.org/x/bluetooth"
 )
 
-type RecvHandler func(recvChan chan<- []byte) func(c []byte)
+type RecvHandler func(recvChan chan<- []byte, btOut chan<- struct{}) func(c []byte)
 
 func CheckRecvHandler(c []byte) {
 	slog.Debug(c)
 }
 
-func RWRecvHandler(recvChan chan<- []byte) func(c []byte) {
+func RWRecvHandler(recvChan chan<- []byte, btOut chan<- struct{}) func(c []byte) {
 	return func(c []byte) {
 		//slog.Warn("repl")
+		if btOut != nil {
+			btOut <- struct{}{}
+		}
 		recvChan <- c
 	}
 }

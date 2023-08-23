@@ -6,6 +6,7 @@ import (
 	"github.com/andlabs/ui"
 	_ "github.com/andlabs/ui/winmanifest"
 	"github.com/gookit/slog"
+	"github.com/sydneyowl/shx8800-ble-connector/config"
 	"github.com/sydneyowl/shx8800-ble-connector/internal/bluetooth_tool"
 	"github.com/sydneyowl/shx8800-ble-connector/internal/serial_tool"
 	"github.com/sydneyowl/shx8800-ble-connector/pkg/exceptions"
@@ -15,6 +16,8 @@ import (
 	"tinygo.org/x/bluetooth"
 )
 
+var bttx *ui.ColorButton
+var btrx *ui.ColorButton
 var btbox *ui.EditableCombobox
 var mainwin *ui.Window
 var entry *ui.MultilineEntry
@@ -28,7 +31,8 @@ var bar *ui.ProgressBar
 var scanStatus *ui.Label
 var canceler context.CancelFunc
 var globalDevList = make(map[string]bluetooth.ScanResult, 0)
-
+var btIn = make(chan struct{}, 100)
+var btOut = make(chan struct{}, 100)
 var checkCharacteristic, rwCharacteristic *bluetooth.DeviceCharacteristic = nil, nil
 
 func contains(elems []string, v string) bool {
@@ -39,6 +43,37 @@ func contains(elems []string, v string) bool {
 	}
 	return false
 }
+
+func chgColorOnRecv(ctx context.Context, btIn chan struct{}, btOut chan struct{}) {
+	go func(ctx context.Context, btIn chan struct{}) {
+		for {
+			select {
+			case <-btIn:
+				//green
+				btrx.SetColor(0.167882, 0.704918, 0.109562, 1)
+				time.Sleep(time.Millisecond * 3)
+				//white
+				btrx.SetColor(0.99, 0.99, 0.98, 1)
+			case <-ctx.Done():
+				return
+			}
+		}
+	}(ctx, btIn)
+	go func(ctx context.Context, btOut chan struct{}) {
+		for {
+			select {
+			case <-btOut:
+				bttx.SetColor(0.9672130, 0.0618894, 0.0312005, 1)
+				time.Sleep(time.Millisecond * 3)
+				bttx.SetColor(0.99, 0.99, 0.98, 1)
+			case <-ctx.Done():
+				return
+			}
+		}
+	}(ctx, btOut)
+
+}
+
 func makeBasicControlsPage() ui.Control {
 	vbox := ui.NewVerticalBox()
 	vbox.SetPadded(true)
@@ -79,12 +114,35 @@ func makeBasicControlsPage() ui.Control {
 	vbox.Append(ui.NewHorizontalSeparator(), false)
 	//status := ui.New()
 	group := ui.NewGroup("信息")
-	group.SetMargined(true)
-	vbox.Append(group, true)
 	entry = ui.NewNonWrappingMultilineEntry()
 	entry.SetReadOnly(true)
 	group.SetChild(entry)
-
+	group.SetMargined(true)
+	vbox.Append(group, true)
+	btrx = ui.NewColorButton()
+	bttx = ui.NewColorButton()
+	bttx.Disable()
+	btrx.Disable()
+	bttx.SetColor(0.99, 0.99, 0.98, 1)
+	btrx.SetColor(0.99, 0.99, 0.98, 1)
+	butBox := ui.NewHorizontalBox()
+	butBox.Enable()
+	butBox.SetPadded(true)
+	BTL1 := ui.NewLabel("BT-RX")
+	butBox.Append(BTL1, false)
+	butBox.Append(bttx, true)
+	BTL2 := ui.NewLabel("BT-TX")
+	butBox.Append(BTL2, false)
+	butBox.Append(btrx, true)
+	ee := ui.NewEntry()
+	ee.SetText("--使用前请做好备份工作--")
+	ee.Disable()
+	ef := ui.NewEntry()
+	ef.SetText("shx8800-ble-connector " + config.VER)
+	ef.Disable()
+	butBox.Append(ee, false)
+	butBox.Append(ef, false)
+	vbox.Append(butBox, false)
 	comscan.OnClicked(func(button *ui.Button) {
 		button.Disable()
 		connButton.Disable()
@@ -180,7 +238,7 @@ func updateBtConnStat(addr bluetooth.Address, ctx context.Context) {
 			"连接蓝牙失败")
 		return
 	}
-	defer doGuiShutup()
+	//defer doGuiShutup()
 	addLog("连接成功：" + addr.String())
 	addLog("发现服务中...")
 	services, err := conn.DiscoverServices(nil)
@@ -243,10 +301,11 @@ func updateBtConnStat(addr bluetooth.Address, ctx context.Context) {
 	btReplyChan := make(chan []byte, 5)
 	serialChan := make(chan []byte, 10)
 	errChan := make(chan error, 3)
-	bluetooth_tool.CurrentDevice.SetReadWriteReceiveHandler(bluetooth_tool.RWRecvHandler, btReplyChan)
-	go bluetooth_tool.BTWriter(ctx, serialChan, errChan)
+	bluetooth_tool.CurrentDevice.SetReadWriteReceiveHandler(bluetooth_tool.RWRecvHandler, btReplyChan, btOut)
+	go bluetooth_tool.BTWriter(ctx, serialChan, errChan, btIn)
 	go serial_tool.SerialDataProvider(ctx, serialChan)
 	go serial_tool.SerialDataWriter(ctx, btReplyChan, errChan)
+	chgColorOnRecv(ctx, btIn, btOut)
 	addLog("初始化完成！现在可以连接写频软件了！")
 	addLog("如果遇到读频卡在4%，请点击取消后重新读频即可！\n手台写频完成重启后请重新连接！")
 	addLog("如果一直写频失败，请使用写频线写入")
@@ -308,7 +367,7 @@ func updateComboBt() {
 	}
 }
 func setupUI() {
-	mainwin = ui.NewWindow("森海克斯写频工具", 0, 400, false)
+	mainwin = ui.NewWindow("森海克斯写频工具", 550, 400, false)
 	mainwin.OnClosing(func(*ui.Window) bool {
 		ui.Quit()
 		return true
