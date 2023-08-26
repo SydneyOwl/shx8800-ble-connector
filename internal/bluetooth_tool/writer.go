@@ -3,7 +3,9 @@ package bluetooth_tool
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"github.com/gookit/slog"
+	"github.com/sydneyowl/shx8800-ble-connector/internal/gui_tool"
 	"github.com/sydneyowl/shx8800-ble-connector/pkg/exceptions"
 )
 
@@ -16,6 +18,9 @@ func BTWriter(ctx context.Context, recv <-chan []byte, repErr chan<- error, btIn
 			return
 		case data := <-recv:
 			if btIn != nil {
+				if gui_tool.CheckedLog() {
+					go gui_tool.AddLog(fmt.Sprintf("Bluetooth Send: {%x}", data))
+				}
 				btIn <- struct{}{}
 			}
 			//slog.Warn("writ")

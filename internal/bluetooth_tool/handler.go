@@ -1,7 +1,9 @@
 package bluetooth_tool
 
 import (
+	"fmt"
 	"github.com/gookit/slog"
+	"github.com/sydneyowl/shx8800-ble-connector/internal/gui_tool"
 	"os"
 	"tinygo.org/x/bluetooth"
 )
@@ -16,6 +18,9 @@ func RWRecvHandler(recvChan chan<- []byte, btOut chan<- struct{}) func(c []byte)
 	return func(c []byte) {
 		//slog.Warn("repl")
 		if btOut != nil {
+			if gui_tool.CheckedLog() {
+				go gui_tool.AddLog(fmt.Sprintf("Bluetooth Recv: {%x}", c))
+			}
 			btOut <- struct{}{}
 		}
 		recvChan <- c

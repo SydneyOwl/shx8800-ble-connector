@@ -8,6 +8,7 @@ import (
 	"github.com/gookit/slog"
 	"github.com/sydneyowl/shx8800-ble-connector/config"
 	"github.com/sydneyowl/shx8800-ble-connector/internal/bluetooth_tool"
+	"github.com/sydneyowl/shx8800-ble-connector/internal/gui_tool"
 	"github.com/sydneyowl/shx8800-ble-connector/internal/serial_tool"
 	"github.com/sydneyowl/shx8800-ble-connector/pkg/exceptions"
 	"os"
@@ -26,6 +27,7 @@ var btList = make([]string, 0)
 var conn *bluetooth.Device
 var scanBut *ui.Button
 var comscan *ui.Button
+var logButton *ui.Checkbox
 var connButton *ui.Button
 var bar *ui.ProgressBar
 var scanStatus *ui.Label
@@ -102,7 +104,13 @@ func makeBasicControlsPage() ui.Control {
 	butAndChoices.Append(ui.NewVerticalSeparator(), false)
 	startBox := ui.NewHorizontalBox()
 	connButton = ui.NewButton("开始连接")
+	logButton = ui.NewCheckbox("原始数据输出(可能减慢传输速率)")
+	logButton.OnToggled(func(checkbox *ui.Checkbox) {
+		gui_tool.LogStatus(checkbox.Checked())
+	})
 	startBox.Append(connButton, false)
+	startBox.Append(logButton, false)
+	startBox.SetPadded(true)
 	butAndChoices.Append(startBox, false)
 	pgbar := ui.NewVerticalBox()
 	scanStatus = ui.NewLabel("等待扫描...")
@@ -116,6 +124,7 @@ func makeBasicControlsPage() ui.Control {
 	group := ui.NewGroup("信息")
 	entry = ui.NewNonWrappingMultilineEntry()
 	entry.SetReadOnly(true)
+	gui_tool.SetEntry(entry)
 	group.SetChild(entry)
 	group.SetMargined(true)
 	vbox.Append(group, true)
@@ -182,7 +191,7 @@ func makeBasicControlsPage() ui.Control {
 				ui.MsgBoxError(mainwin,
 					"错误",
 					"请选择正确的选项")
-				addLog("未找到设备！")
+				gui_tool.AddLog("未找到设备！")
 				button.Enable()
 				return
 			}
@@ -191,7 +200,7 @@ func makeBasicControlsPage() ui.Control {
 				ui.MsgBoxError(mainwin,
 					"错误",
 					"连接端口失败:"+err.Error())
-				addLog("端口连接失败！")
+				gui_tool.AddLog("端口连接失败！")
 				button.Enable()
 				return
 			}
@@ -210,20 +219,13 @@ func makeBasicControlsPage() ui.Control {
 func doGuiShutup() {
 	bluetooth_tool.DisconnectDevice(conn)
 	serial_tool.ShutPort()
-	addLog("连接断开！")
-	addLog("清理...")
+	gui_tool.AddLog("连接断开！")
+	gui_tool.AddLog("清理...")
 	canceler()
 	time.Sleep(time.Second)
 	os.Exit(0)
 	//connButton.SetText("开始连接")
 	//connButton.Enable()
-}
-func addLog(log string) {
-	currData := time.Now().Format("2006-01-02 15:04:05")
-	entry.Append(currData)
-	entry.Append("\t")
-	entry.Append(log)
-	entry.Append("\n")
 }
 func updateBtConnStat(addr bluetooth.Address, ctx context.Context) {
 	connChan := make(chan *bluetooth.Device, 0)
@@ -239,22 +241,22 @@ func updateBtConnStat(addr bluetooth.Address, ctx context.Context) {
 		return
 	}
 	//defer doGuiShutup()
-	addLog("连接成功：" + addr.String())
-	addLog("发现服务中...")
+	gui_tool.AddLog("连接成功：" + addr.String())
+	gui_tool.AddLog("发现服务中...")
 	services, err := conn.DiscoverServices(nil)
 	if err != nil {
-		addLog("无法发现服务")
+		gui_tool.AddLog("无法发现服务")
 		ui.MsgBoxError(mainwin,
 			"错误",
 			"发现服务失败！")
 		return
 	}
-	addLog("发现特征中...")
+	gui_tool.AddLog("发现特征中...")
 	var _, manufacturer, model, firmware = make([]byte, 10), make([]byte, 20), make([]byte, 20), make([]byte, 20)
 	for _, service := range services {
 		chs, err := service.DiscoverCharacteristics(nil)
 		if err != nil {
-			addLog("无法发现特征")
+			gui_tool.AddLog("无法发现特征")
 			ui.MsgBoxError(mainwin,
 				"错误",
 				"发现特征失败！")
@@ -264,17 +266,17 @@ func updateBtConnStat(addr bluetooth.Address, ctx context.Context) {
 		for i, ch := range chs {
 			if strings.Contains(ch.String(), bluetooth_tool.FIRMWARE_REVISION_CHARACTERISTIC_UUID) {
 				_, _ = ch.Read(firmware)
-				addLog("固件版本：" + string(firmware))
+				gui_tool.AddLog("固件版本：" + string(firmware))
 				continue
 			}
 			if strings.Contains(ch.String(), bluetooth_tool.MANUFACTURER_CHARACTERISTIC_UUID) {
 				_, _ = ch.Read(manufacturer)
-				addLog("生产产商：" + string(manufacturer))
+				gui_tool.AddLog("生产产商：" + string(manufacturer))
 				continue
 			}
 			if strings.Contains(ch.String(), bluetooth_tool.MODEL_NUMBER_CHARACTERISTIC_UUID) {
 				_, _ = ch.Read(model)
-				addLog("设备型号：" + string(model))
+				gui_tool.AddLog("设备型号：" + string(model))
 				continue
 			}
 			if strings.Contains(ch.String(), bluetooth_tool.CHECK_CHARACTERISTIC_UUID) {
@@ -288,7 +290,7 @@ func updateBtConnStat(addr bluetooth.Address, ctx context.Context) {
 		}
 	}
 	if checkCharacteristic == nil || rwCharacteristic == nil {
-		addLog("无法获取设备通道")
+		gui_tool.AddLog("无法获取设备通道")
 		ui.MsgBoxError(mainwin,
 			"错误",
 			"无法获取设备信息，请检查设备！")
@@ -306,18 +308,18 @@ func updateBtConnStat(addr bluetooth.Address, ctx context.Context) {
 	go serial_tool.SerialDataProvider(ctx, serialChan)
 	go serial_tool.SerialDataWriter(ctx, btReplyChan, errChan)
 	chgColorOnRecv(ctx, btIn, btOut)
-	addLog("初始化完成！现在可以连接写频软件了！")
-	addLog("如果遇到读频卡在4%，请点击取消后重新读频即可！\n手台写频完成重启后请重新连接！")
-	addLog("如果一直写频失败，请使用写频线写入")
+	gui_tool.AddLog("初始化完成！现在可以连接写频软件了！")
+	gui_tool.AddLog("如果遇到读频卡在4%，请点击取消后重新读频即可！\n手台写频完成重启后请重新连接！")
+	gui_tool.AddLog("如果一直写频失败，请使用写频线写入")
 	go func() {
 		err := <-errChan
 		if errors.Is(err, exceptions.TransferDone) {
-			addLog("传输完成！对讲机将重启，您可以退出了...")
+			gui_tool.AddLog("传输完成！对讲机将重启，您可以退出了...")
 			ui.MsgBox(mainwin,
 				"提醒",
 				"传输完成！对讲机将重启！")
 		} else {
-			addLog("出现异常，如果对讲机写频完成后重启了或者对讲机已经被关闭，您可以忽略提示" + err.Error())
+			gui_tool.AddLog("出现异常，如果对讲机写频完成后重启了或者对讲机已经被关闭，您可以忽略提示" + err.Error())
 			ui.MsgBoxError(mainwin,
 				"注意",
 				"出现异常，如果对讲机写频完成后重启了或者对讲机已经被关闭，您可以忽略提示")
