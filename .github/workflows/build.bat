@@ -9,7 +9,7 @@ md tmp
 go mod tidy
 set CC=x86_64-w64-mingw32-gcc
 
-cd cmd\shell
+cd entrance\shell
 REM 64
 set GOARCH=amd64
 go build -tags="cmd" -ldflags "-X 'github.com/sydneyowl/shx8800-ble-connector/config.VER=%BUILDVERSION%' -X 'github.com/sydneyowl/shx8800-ble-connector/config.COMMIT=%COMMIT%' -X 'github.com/sydneyowl/shx8800-ble-connector/config.BUILDTIME=%BUILDTIME%'"
