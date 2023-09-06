@@ -12,7 +12,7 @@ set CC=x86_64-w64-mingw32-gcc
 cd cmd\shell
 REM 64
 set GOARCH=amd64
-go build -ldflags "-X 'github.com/sydneyowl/shx8800-ble-connector/config.VER=%BUILDVERSION%' -X 'github.com/sydneyowl/shx8800-ble-connector/config.COMMIT=%COMMIT%' -X 'github.com/sydneyowl/shx8800-ble-connector/config.BUILDTIME=%BUILDTIME%'"
+go build -tags="cmd" -ldflags "-X 'github.com/sydneyowl/shx8800-ble-connector/config.VER=%BUILDVERSION%' -X 'github.com/sydneyowl/shx8800-ble-connector/config.COMMIT=%COMMIT%' -X 'github.com/sydneyowl/shx8800-ble-connector/config.BUILDTIME=%BUILDTIME%'"
 move /Y shell.exe ..\..\tmp\shx8800-ble-connector_windows_amd64.exe 2>nul
 
 cd ..\gui

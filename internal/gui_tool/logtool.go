@@ -1,10 +1,12 @@
+//go:build gui
+
 package gui_tool
 
 import (
+	"github.com/andlabs/ui"
 	"sync"
 	"time"
 )
-import "github.com/andlabs/ui"
 
 var checked bool
 var entry *ui.MultilineEntry
