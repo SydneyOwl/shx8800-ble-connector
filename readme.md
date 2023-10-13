@@ -40,11 +40,11 @@
 
 直接从releases下载对应版本的软件.双击运行即可
 
-shx8800-ble-connector_windows_amd64.exe --------命令行版本
+shx8800-ble-connector_windows_amd64.exe --------命令行版本gif演示：
 
 ![img.png](md_assets/readme/cmd.gif)
 
-shx8800-ble-connector-with-gui_windows_amd64.exe --------图形版本
+shx8800-ble-connector-with-gui_windows_amd64.exe --------图形版本gif演示：
 
 ![img.png](md_assets/readme/gui.gif)
 
