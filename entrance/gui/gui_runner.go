@@ -248,7 +248,7 @@ func updateBtConnStat(addr bluetooth.Address, ctx context.Context) {
 		gui_tool.AddLog("无法发现服务")
 		ui.MsgBoxError(mainwin,
 			"错误",
-			"发现服务失败！")
+			"发现服务失败！"+err.Error())
 		return
 	}
 	gui_tool.AddLog("发现特征中...")
@@ -259,7 +259,7 @@ func updateBtConnStat(addr bluetooth.Address, ctx context.Context) {
 			gui_tool.AddLog("无法发现特征")
 			ui.MsgBoxError(mainwin,
 				"错误",
-				"发现特征失败！")
+				"发现特征失败！"+err.Error())
 			return
 		}
 		slog.Trace(chs)

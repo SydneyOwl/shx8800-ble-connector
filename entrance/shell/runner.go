@@ -91,7 +91,7 @@ func StartAndRun() {
 	conn, err := bluetooth_tool.ConnectByMac(deviceSHX.Address)
 	btConn = conn
 	if err != nil {
-		slog.Fatalf("无法连接设备")
+		slog.Fatalf("无法连接设备:%v", err)
 		_, _ = fmt.Scanln()
 		os.Exit(-1)
 	}
@@ -99,7 +99,7 @@ func StartAndRun() {
 	slog.Debug("正在发现服务...")
 	services, err := conn.DiscoverServices(nil)
 	if err != nil {
-		slog.Fatalf("无法发现服务")
+		slog.Fatalf("无法发现服务:%v", err)
 		_, _ = fmt.Scanln()
 		os.Exit(-1)
 	}
@@ -110,7 +110,7 @@ func StartAndRun() {
 	for _, service := range services {
 		chs, err := service.DiscoverCharacteristics(nil)
 		if err != nil {
-			slog.Fatalf("无法发现特征")
+			slog.Fatalf("无法发现特征:%v", err)
 			_, _ = fmt.Scanln()
 			os.Exit(-1)
 		}
