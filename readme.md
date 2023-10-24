@@ -12,8 +12,12 @@
 
 ## 简介
 
-**注意：32位版本暂时无法使用，这是因为所用库对32位系统支持不完善造成的（[signal arrived during external code execution · Issue #189](https://github.com/tinygo-org/bluetooth/issues/189)）。请使用64位进行编译、使用**
+**注意：**
 
++ 32位版本暂时无法使用，这是因为所用库对32位系统支持不完善造成的（[signal arrived during external code execution · Issue #189](https://github.com/tinygo-org/bluetooth/issues/189)）。请使用64位进行编译、使用
+
++ 软件尚不稳定，特别是图形界面！
+  
 该软件能在具有蓝牙能力的pc端上在没有写频线的情况下对森海克斯8800进行写频。
 
 本质上该软件是一个中继器。由于windows无法直接为森海克斯8800蓝牙创建虚拟端口，该软件能做到连接森海克斯的蓝牙，在虚拟端口软件的支持下，与官方写频软件进行数据包的交换。（蓝牙写频协议和写频线串口写频协议应该是一致的，不确定，但是经测试可用）
