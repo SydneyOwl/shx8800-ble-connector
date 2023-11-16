@@ -42,7 +42,7 @@
 
 ### 直接使用
 
-[使用视频](https://www.bilibili.com/video/BV1fh4y1m7M8)
+[使用视频](https://www.bilibili.com/video/BV1ou4y1N7kb/)
 
 直接从releases下载对应版本的软件.双击运行即可
 
