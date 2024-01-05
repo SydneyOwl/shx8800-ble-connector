@@ -6,6 +6,7 @@ import (
 	_ "github.com/andlabs/ui/winmanifest"
 	"github.com/sydneyowl/shx8800-ble-connector/internal/gui_tool"
 	"github.com/sydneyowl/shx8800-ble-connector/internal/serial_tool"
+	"strconv"
 	"strings"
 	"tinygo.org/x/bluetooth"
 )
@@ -23,6 +24,8 @@ var logButton *ui.Checkbox
 var connButton *ui.Button
 var bar *ui.ProgressBar
 var scanStatus *ui.Label
+var chgBandrate *ui.EditableCombobox
+var bandRateLabel *ui.Label
 
 func clickConnectButton(button *ui.Button) {
 	button.Disable()
@@ -91,4 +94,12 @@ func pressComscan(button *ui.Button) {
 
 func logButtonToggled(checkbox *ui.Checkbox) {
 	gui_tool.LogStatus(checkbox.Checked())
+}
+func baudrateCallback(combobox *ui.EditableCombobox) {
+	gui_tool.AddLog("Now changed to " + combobox.Text())
+	rate := combobox.Text()
+	if rate == "9600（如无需要请勿更改）" {
+		rate = "9600"
+	}
+	serial_tool.BAUDRATE, _ = strconv.Atoi(rate)
 }

@@ -13,6 +13,7 @@ import (
 	"github.com/sydneyowl/shx8800-ble-connector/pkg/exceptions"
 	"os"
 	"os/exec"
+	"strconv"
 	"strings"
 	"time"
 	"tinygo.org/x/bluetooth"
@@ -87,6 +88,18 @@ func makeBasicControlsPage() ui.Control {
 	scanBut.Disable()
 	hbox2.Append(scanBut, false)
 	allChoices.Append(hbox2, false)
+	hbox3 := ui.NewHorizontalBox()
+	hbox3.SetPadded(true)
+	bandRateLabel = ui.NewLabel("波特率：")
+	hbox3.Append(bandRateLabel, false)
+	chgBandrate = ui.NewEditableCombobox()
+	chgBandrate.SetText("9600（如无需要请勿更改）")
+	for _, v := range serial_tool.AVAILABLE_BAUDRATE {
+		chgBandrate.Append(strconv.Itoa(v))
+	}
+	chgBandrate.OnChanged(baudrateCallback)
+	hbox3.Append(chgBandrate, false)
+	allChoices.Append(hbox3, false)
 	butAndChoices.Append(allChoices, false)
 	butAndChoices.Append(ui.NewVerticalSeparator(), false)
 	startBox := ui.NewHorizontalBox()

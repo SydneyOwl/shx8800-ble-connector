@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/spf13/cobra"
 	"github.com/sydneyowl/shx8800-ble-connector/config"
+	"github.com/sydneyowl/shx8800-ble-connector/internal/serial_tool"
 	"github.com/sydneyowl/shx8800-ble-connector/pkg/logger"
 	"os"
 )
@@ -39,6 +40,7 @@ func init() {
 	BaseCmd.PersistentFlags().BoolVar(&PrintVersion, "version", false, "Print Version")
 	BaseCmd.PersistentFlags().BoolVar(&Verbose, "verbose", false, "Print Debug Level logs")
 	BaseCmd.PersistentFlags().BoolVar(&Vverbose, "vverbose", false, "Print Debug/Trace Level logs")
+	BaseCmd.PersistentFlags().IntVar(&serial_tool.BAUDRATE, "baud", serial_tool.BAUDRATE, "Set Baudrate. Experiential")
 }
 
 func main() {
