@@ -60,7 +60,7 @@ func StartAndRun() {
 		os.Exit(-1)
 	}
 	slog.Info("端口连接成功！")
-
+	serial_tool.SetConnectedStatus(true)
 	// Device-BT
 	slog.Infof("正在扫描设备,请等待%d秒...", bluetooth_tool.BT_SCAN_TIMEOUT)
 	list, err := bluetooth_tool.GetAvailableBtDevList(bluetooth_tool.SHX8800Filter)
@@ -96,6 +96,7 @@ func StartAndRun() {
 		os.Exit(-1)
 	}
 	slog.Info("连接成功！")
+	bluetooth_tool.SetConnectStatus(true)
 	slog.Debug("正在发现服务...")
 	services, err := conn.DiscoverServices(nil)
 	if err != nil {

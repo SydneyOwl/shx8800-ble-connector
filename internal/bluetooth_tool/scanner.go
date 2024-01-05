@@ -50,5 +50,6 @@ func SetHandler(connHandler func(address bluetooth.Address, connected bool)) {
 }
 func DisconnectDevice(shx *bluetooth.Device) {
 	call_disconnect = true
+	connected = false
 	_ = shx.Disconnect()
 }

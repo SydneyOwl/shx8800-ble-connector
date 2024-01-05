@@ -15,3 +15,12 @@ const (
 	WriteStep1
 	WriteStep
 )
+
+var connected = false
+
+func SetConnectedStatus(stat bool) {
+	connected = stat
+}
+func GetConnectedStatus() bool {
+	return connected
+}

@@ -12,27 +12,16 @@ import (
 	"github.com/sydneyowl/shx8800-ble-connector/internal/serial_tool"
 	"github.com/sydneyowl/shx8800-ble-connector/pkg/exceptions"
 	"os"
+	"os/exec"
 	"strings"
 	"time"
 	"tinygo.org/x/bluetooth"
 )
 
-var bttx *ui.ColorButton
-var btrx *ui.ColorButton
-var btbox *ui.EditableCombobox
-var mainwin *ui.Window
-var entry *ui.MultilineEntry
 var comList = make([]string, 0)
 var btList = make([]string, 0)
-var conn *bluetooth.Device
-var scanBut *ui.Button
-var comscan *ui.Button
-var logButton *ui.Checkbox
-var connButton *ui.Button
-var bar *ui.ProgressBar
-var scanStatus *ui.Label
 var canceler context.CancelFunc
-var globalDevList = make(map[string]bluetooth.ScanResult, 0)
+var globalDevList = make(map[string]bluetooth.ScanResult)
 var btIn = make(chan struct{}, 100)
 var btOut = make(chan struct{}, 100)
 var checkCharacteristic, rwCharacteristic *bluetooth.DeviceCharacteristic = nil, nil
@@ -45,7 +34,6 @@ func contains(elems []string, v string) bool {
 	}
 	return false
 }
-
 func chgColorOnRecv(ctx context.Context, btIn chan struct{}, btOut chan struct{}) {
 	go func(ctx context.Context, btIn chan struct{}) {
 		for {
@@ -75,7 +63,6 @@ func chgColorOnRecv(ctx context.Context, btIn chan struct{}, btOut chan struct{}
 	}(ctx, btOut)
 
 }
-
 func makeBasicControlsPage() ui.Control {
 	vbox := ui.NewVerticalBox()
 	vbox.SetPadded(true)
@@ -85,7 +72,7 @@ func makeBasicControlsPage() ui.Control {
 	allChoices.SetPadded(true)
 	hbox := ui.NewHorizontalBox()
 	hbox.SetPadded(true)
-	combox := ui.NewEditableCombobox()
+	combox = ui.NewEditableCombobox()
 	combox.SetText("-----请选择-----")
 	comscan = ui.NewButton("扫描端口")
 	hbox.Append(combox, false)
@@ -105,9 +92,7 @@ func makeBasicControlsPage() ui.Control {
 	startBox := ui.NewHorizontalBox()
 	connButton = ui.NewButton("开始连接")
 	logButton = ui.NewCheckbox("原始数据输出(可能减慢传输速率)")
-	logButton.OnToggled(func(checkbox *ui.Checkbox) {
-		gui_tool.LogStatus(checkbox.Checked())
-	})
+	logButton.OnToggled(logButtonToggled)
 	startBox.Append(connButton, false)
 	startBox.Append(logButton, false)
 	startBox.SetPadded(true)
@@ -152,83 +137,13 @@ func makeBasicControlsPage() ui.Control {
 	butBox.Append(ee, false)
 	butBox.Append(ef, false)
 	vbox.Append(butBox, false)
-	comscan.OnClicked(func(button *ui.Button) {
-		button.Disable()
-		connButton.Disable()
-		defer button.Enable()
-		defer connButton.Enable()
-		defer scanBut.Enable()
-		ports, err := serial_tool.ScanPort()
-		if err != nil {
-			ui.MsgBoxError(mainwin,
-				"错误",
-				"扫描端口出现错误："+err.Error())
-			return
-		}
-		for i := range ports {
-			if !contains(comList, ports[i]) {
-				combox.Append(ports[i])
-				comList = append(comList, ports[i])
-			}
-		}
-		if len(comList) == 0 {
-			combox.SetText("未找到设备")
-		} else {
-			combox.SetText(ports[0])
-		}
-	})
-	scanBut.OnClicked(func(button *ui.Button) {
-		button.Disable()
-		connButton.Disable()
-		go updateComboBt()
-	})
-	connButton.OnClicked(func(button *ui.Button) {
-		button.Disable()
-		if button.Text() == "开始连接" {
-			com := combox.Text()
-			bt := btbox.Text()
-			if com == "未找到设备" || bt == "未找到设备" || com == "-----请选择-----" || bt == "-----请选择-----" {
-				ui.MsgBoxError(mainwin,
-					"错误",
-					"请选择正确的选项")
-				gui_tool.AddLog("未找到设备！")
-				button.Enable()
-				return
-			}
-			err := serial_tool.ConnPort(com)
-			if err != nil {
-				ui.MsgBoxError(mainwin,
-					"错误",
-					"连接端口失败:"+err.Error())
-				gui_tool.AddLog("端口连接失败！")
-				button.Enable()
-				return
-			}
-			addr := strings.Split(bt, "]")
-			mac := addr[len(addr)-1]
-			ctx, cancel := context.WithCancel(context.Background())
-			canceler = cancel
-			go updateBtConnStat(globalDevList[mac].Address, ctx)
-			//go bluetooth_tool.ConnectByMacNoBlock(globalDevList[mac].Address, connChan)
-		} else {
-			doGuiShutup()
-		}
-	})
+	comscan.OnClicked(pressComscan)
+	scanBut.OnClicked(pressBtScan)
+	connButton.OnClicked(clickConnectButton)
 	return vbox
 }
-func doGuiShutup() {
-	bluetooth_tool.DisconnectDevice(conn)
-	serial_tool.ShutPort()
-	gui_tool.AddLog("连接断开！")
-	gui_tool.AddLog("清理...")
-	canceler()
-	time.Sleep(time.Second)
-	os.Exit(0)
-	//connButton.SetText("开始连接")
-	//connButton.Enable()
-}
 func updateBtConnStat(addr bluetooth.Address, ctx context.Context) {
-	connChan := make(chan *bluetooth.Device, 0)
+	connChan := make(chan *bluetooth.Device)
 	bar.SetValue(-1)
 	defer connButton.Enable()
 	defer bar.SetValue(0)
@@ -242,6 +157,7 @@ func updateBtConnStat(addr bluetooth.Address, ctx context.Context) {
 	}
 	//defer doGuiShutup()
 	gui_tool.AddLog("连接成功：" + addr.String())
+	bluetooth_tool.SetConnectStatus(true)
 	gui_tool.AddLog("发现服务中...")
 	services, err := conn.DiscoverServices(nil)
 	if err != nil {
@@ -333,7 +249,7 @@ func updateBtConnStat(addr bluetooth.Address, ctx context.Context) {
 }
 func updateComboBt() {
 	devList := make([]bluetooth.ScanResult, 0)
-	errChan := make(chan error, 0)
+	errChan := make(chan error)
 	bar.SetValue(-1)
 	scanStatus.SetText("扫描中，请等待...")
 	defer func() {
@@ -342,7 +258,7 @@ func updateComboBt() {
 		bar.SetValue(0)
 		scanStatus.SetText("扫描结束")
 	}()
-	go bluetooth_tool.GetAvailableBtDevListViaChannel(bluetooth_tool.SHX8800Filter, errChan, &devList)
+	go bluetooth_tool.GetAvailableBtDevListViaChannel(bluetooth_tool.SHX8800Filter, &devList, errChan)
 	for {
 		err, ok := <-errChan
 		if !ok {
@@ -351,7 +267,8 @@ func updateComboBt() {
 		if err != nil {
 			ui.MsgBoxError(mainwin,
 				"错误",
-				"扫描蓝牙出现错误："+err.Error())
+				"扫描蓝牙出现错误："+err.Error()+", 原因我也不知道...重新启动程序即可解决！按下确定重重启程序")
+			doRestart()
 			return
 		}
 	}
@@ -383,8 +300,30 @@ func setupUI() {
 	mainwin.SetChild(makeBasicControlsPage())
 	mainwin.Show()
 }
-
 func GUI() {
 	//defer doGuiShutup()
 	_ = ui.Main(setupUI)
+}
+func doGuiShutup() {
+	if bluetooth_tool.GetConnectStatus() {
+		bluetooth_tool.DisconnectDevice(conn)
+	}
+	if serial_tool.GetConnectedStatus() {
+		serial_tool.ShutPort()
+	}
+	gui_tool.AddLog("连接断开！")
+	gui_tool.AddLog("清理...")
+	if canceler != nil {
+		canceler()
+	}
+	time.Sleep(time.Second)
+	os.Exit(0)
+	//connButton.SetText("开始连接")
+	//connButton.Enable()
+}
+func doRestart() {
+	defer doGuiShutup()
+	exePath, _ := os.Executable()
+	go exec.Command(exePath, os.Args...).Run()
+	time.Sleep(time.Second * 2)
 }

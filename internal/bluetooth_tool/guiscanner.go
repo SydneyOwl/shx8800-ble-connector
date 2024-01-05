@@ -8,7 +8,7 @@ import (
 	"tinygo.org/x/bluetooth"
 )
 
-func GetAvailableBtDevListViaChannel(filter DeviceFilter, errChan chan error, devList *[]bluetooth.ScanResult) {
+func GetAvailableBtDevListViaChannel(filter DeviceFilter, devList *[]bluetooth.ScanResult, errChan chan error) {
 	removeRepeat := make(map[string]bool)
 	if err := adapter.Enable(); err != nil {
 		errChan <- err
