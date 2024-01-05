@@ -337,6 +337,8 @@ func doGuiShutup() {
 func doRestart() {
 	defer doGuiShutup()
 	exePath, _ := os.Executable()
-	go exec.Command(exePath, os.Args...).Run()
+	go func() {
+		_ = exec.Command(exePath, os.Args...).Run()
+	}()
 	time.Sleep(time.Second * 2)
 }
