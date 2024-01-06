@@ -14,8 +14,7 @@
 
 **注意：**
 
-+
-32位版本暂时无法使用，这是因为所用库对32位系统支持不完善造成的（[signal arrived during external code execution · Issue #189](https://github.com/tinygo-org/bluetooth/issues/189)
++ 32位版本暂时无法使用，这是因为所用库对32位系统支持不完善造成的（[signal arrived during external code execution · Issue #189](https://github.com/tinygo-org/bluetooth/issues/189)
 ）。请使用64位进行编译、使用
 
 + 软件尚不稳定，特别是图形界面！
@@ -28,8 +27,7 @@
 
 ## 使用方法
 
-**警告：请在使用前做好备份工作（虽然理论上写频操作中途断开不会对设备造成影响）；绝对不要将此软件用于除读写频之外的功能（如系统升级）！对使用此软件产生的一切后果作者不负任何责任！
-**
+**警告：请在使用前做好备份工作（虽然理论上写频操作中途断开不会对设备造成影响）；绝对不要将此软件用于除读写频之外的功能（如系统升级）！对使用此软件产生的一切后果作者不负任何责任！**
 
 ### 前置工作
 
