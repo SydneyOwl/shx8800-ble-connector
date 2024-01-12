@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/andlabs/ui"
 	_ "github.com/andlabs/ui/winmanifest"
+	"github.com/sydneyowl/shx8800-ble-connector/internal/bluetooth_tool"
 	"github.com/sydneyowl/shx8800-ble-connector/internal/gui_tool"
 	"github.com/sydneyowl/shx8800-ble-connector/internal/serial_tool"
 	"strconv"
@@ -26,6 +27,7 @@ var bar *ui.ProgressBar
 var scanStatus *ui.Label
 var chgBandrate *ui.EditableCombobox
 var bandRateLabel *ui.Label
+var disableFilterCheckbox *ui.Checkbox
 
 func clickConnectButton(button *ui.Button) {
 	button.Disable()
@@ -94,6 +96,10 @@ func pressComscan(button *ui.Button) {
 
 func logButtonToggled(checkbox *ui.Checkbox) {
 	gui_tool.LogStatus(checkbox.Checked())
+}
+
+func filterCallback(checkbox *ui.Checkbox) {
+	bluetooth_tool.NO_SSID_FILTER = true
 }
 func baudrateCallback(combobox *ui.EditableCombobox) {
 	gui_tool.AddLog("Now changed to " + combobox.Text())

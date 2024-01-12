@@ -104,10 +104,16 @@ func makeBasicControlsPage() ui.Control {
 	butAndChoices.Append(ui.NewVerticalSeparator(), false)
 	startBox := ui.NewHorizontalBox()
 	connButton = ui.NewButton("开始连接")
+	hzox := ui.NewVerticalBox()
 	logButton = ui.NewCheckbox("原始数据输出(可能减慢传输速率)")
 	logButton.OnToggled(logButtonToggled)
+	hzox.Append(logButton, true)
+	disableFilterCheckbox = ui.NewCheckbox("禁用ssid过滤")
+	disableFilterCheckbox.SetChecked(false)
+	disableFilterCheckbox.OnToggled(filterCallback)
+	hzox.Append(disableFilterCheckbox, true)
 	startBox.Append(connButton, false)
-	startBox.Append(logButton, false)
+	startBox.Append(hzox, false)
 	startBox.SetPadded(true)
 	butAndChoices.Append(startBox, false)
 	pgbar := ui.NewVerticalBox()
@@ -271,7 +277,13 @@ func updateComboBt() {
 		bar.SetValue(0)
 		scanStatus.SetText("扫描结束")
 	}()
-	go bluetooth_tool.GetAvailableBtDevListViaChannel(bluetooth_tool.SHX8800Filter, &devList, errChan)
+	var filter bluetooth_tool.DeviceFilter
+	if bluetooth_tool.NO_SSID_FILTER {
+		filter = bluetooth_tool.EmptyFilter
+	} else {
+		filter = bluetooth_tool.SHX8800Filter
+	}
+	go bluetooth_tool.GetAvailableBtDevListViaChannel(filter, &devList, errChan)
 	for {
 		err, ok := <-errChan
 		if !ok {

@@ -63,7 +63,13 @@ func StartAndRun() {
 	serial_tool.SetConnectedStatus(true)
 	// Device-BT
 	slog.Infof("正在扫描设备,请等待%d秒...", bluetooth_tool.BT_SCAN_TIMEOUT)
-	list, err := bluetooth_tool.GetAvailableBtDevList(bluetooth_tool.SHX8800Filter)
+	var filter bluetooth_tool.DeviceFilter
+	if bluetooth_tool.NO_SSID_FILTER {
+		filter = bluetooth_tool.EmptyFilter
+	} else {
+		filter = bluetooth_tool.SHX8800Filter
+	}
+	list, err := bluetooth_tool.GetAvailableBtDevList(filter)
 	if err != nil {
 		slog.Fatalf("扫描失败: %v", err)
 		_, _ = fmt.Scanln()
