@@ -12,7 +12,7 @@
 
 ## 简介
 
-**蓝牙写频功能已集成在修改后的写频软件中（https://github.com/SydneyOwl/shx8x00-freq-writer-enhanced），欢迎下载体验！**
+**蓝牙写频功能已集成在修改后的写频软件中【https://github.com/SydneyOwl/shx8x00-freq-writer-enhanced】，欢迎下载体验！**
 
 **注意：**
 
