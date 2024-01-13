@@ -12,6 +12,8 @@
 
 ## 简介
 
+**蓝牙写频功能已集成在修改后的写频软件中（https://github.com/SydneyOwl/shx8x00-freq-writer-enhanced），欢迎下载体验！**
+
 **注意：**
 
 + 32位版本暂时无法使用，这是因为所用库对32位系统支持不完善造成的（[signal arrived during external code execution · Issue #189](https://github.com/tinygo-org/bluetooth/issues/189)
