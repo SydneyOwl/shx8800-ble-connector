@@ -5,7 +5,7 @@ go 1.20
 require (
 	github.com/andlabs/ui v0.0.0-20200610043537-70a69d6ae31e
 	github.com/gookit/slog v0.5.5
-	github.com/jedib0t/go-pretty/v6 v6.5.4
+	github.com/jedib0t/go-pretty/v6 v6.5.5
 	github.com/spf13/cobra v1.8.0
 	go.bug.st/serial v1.6.0
 	golang.org/x/sync v0.6.0
