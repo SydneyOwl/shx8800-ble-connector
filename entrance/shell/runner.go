@@ -35,6 +35,8 @@ func StartAndRun() {
 		}
 	}()
 	// port
+	slog.Notice("蓝牙写频功能已集成在修改后的写频软件中，欢迎下载体验！")
+	slog.Notice("https://github.com/SydneyOwl/senhaix-freq-writer-enhanced")
 	slog.Info("搜索端口...")
 	ports, err := serial_tool.ScanPort()
 	if err != nil {

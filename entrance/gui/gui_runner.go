@@ -323,6 +323,7 @@ func setupUI() {
 
 	mainwin.SetMargined(true)
 	mainwin.SetChild(makeBasicControlsPage())
+	ui.MsgBox(mainwin, "提醒", "蓝牙写频功能已集成在修改后的写频软件中，欢迎下载体验！\n地址：https://github.com/SydneyOwl/senhaix-freq-writer-enhanced")
 	mainwin.Show()
 }
 func GUI() {
