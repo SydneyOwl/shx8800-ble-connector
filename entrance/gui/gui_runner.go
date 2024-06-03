@@ -252,7 +252,7 @@ func updateBtConnStat(addr bluetooth.Address, ctx context.Context) {
 			gui_tool.AddLog("传输完成！对讲机将重启，您可以退出了...")
 			ui.MsgBox(mainwin,
 				"提醒",
-				"传输完成！对讲机将重启！")
+				"传输完成！对讲机将重启！如未写频完成但出现该提示，请等待写频完成后再关闭该提示窗口！")
 		} else {
 			gui_tool.AddLog("出现异常，如果对讲机写频完成后重启了或者对讲机已经被关闭，您可以忽略提示" + err.Error())
 			ui.MsgBoxError(mainwin,

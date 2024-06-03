@@ -175,10 +175,9 @@ func StartAndRun() {
 	go func() {
 		err := <-errChan
 		if errors.Is(err, exceptions.TransferDone) {
-			slog.Noticef("传输完成！对讲机将重启，按下回车键退出...")
+			slog.Noticef("传输完成！对讲机将重启，按下回车键退出。如未写频完成但出现该提示，请等待写频完成后再按下回车键退出...")
 		} else {
 			slog.Warnf("出现异常：%v，如果对讲机写频完成后重启了或者对讲机已经被关闭，您可以忽略提示，按下回车键以退出", err)
-			once.Do(doShutup)
 		}
 	}()
 	_, _ = fmt.Scanln()
