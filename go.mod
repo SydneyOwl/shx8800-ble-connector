@@ -5,10 +5,10 @@ go 1.20
 require (
 	github.com/andlabs/ui v0.0.0-20200610043537-70a69d6ae31e
 	github.com/gookit/slog v0.5.7
-	github.com/jedib0t/go-pretty/v6 v6.6.2
+	github.com/jedib0t/go-pretty/v6 v6.6.5
 	github.com/spf13/cobra v1.8.1
 	go.bug.st/serial v1.6.0
-	golang.org/x/sync v0.9.0
+	golang.org/x/sync v0.10.0
 	tinygo.org/x/bluetooth v0.7.1-0.20230811122637-4da7f5812480
 )
 
@@ -31,5 +31,5 @@ require (
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
 	golang.org/x/sys v0.25.0 // indirect
-	golang.org/x/text v0.18.0 // indirect
+	golang.org/x/text v0.21.0 // indirect
 )
