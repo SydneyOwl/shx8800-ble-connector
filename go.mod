@@ -8,7 +8,7 @@ require (
 	github.com/jedib0t/go-pretty/v6 v6.6.7
 	github.com/spf13/cobra v1.9.1
 	go.bug.st/serial v1.6.0
-	golang.org/x/sync v0.11.0
+	golang.org/x/sync v0.14.0
 	tinygo.org/x/bluetooth v0.7.1-0.20230811122637-4da7f5812480
 )
 
