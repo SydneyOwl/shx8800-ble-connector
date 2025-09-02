@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	github.com/andlabs/ui v0.0.0-20200610043537-70a69d6ae31e
-	github.com/gookit/slog v0.5.8
+	github.com/gookit/slog v0.6.0
 	github.com/jedib0t/go-pretty/v6 v6.6.8
 	github.com/spf13/cobra v1.9.1
 	go.bug.st/serial v1.6.0
@@ -17,9 +17,9 @@ require (
 	github.com/fatih/structs v1.1.0 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/godbus/dbus/v5 v5.1.0 // indirect
-	github.com/gookit/color v1.5.4 // indirect
-	github.com/gookit/goutil v0.6.18 // indirect
-	github.com/gookit/gsr v0.1.0 // indirect
+	github.com/gookit/color v1.6.0 // indirect
+	github.com/gookit/goutil v0.7.1 // indirect
+	github.com/gookit/gsr v0.1.1 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/mattn/go-runewidth v0.0.16 // indirect
 	github.com/muka/go-bluetooth v0.0.0-20221213043340-85dc80edc4e1 // indirect
