@@ -6,7 +6,7 @@ require (
 	github.com/andlabs/ui v0.0.0-20200610043537-70a69d6ae31e
 	github.com/gookit/slog v0.5.8
 	github.com/jedib0t/go-pretty/v6 v6.6.8
-	github.com/spf13/cobra v1.9.1
+	github.com/spf13/cobra v1.10.1
 	go.bug.st/serial v1.6.0
 	golang.org/x/sync v0.11.0
 	tinygo.org/x/bluetooth v0.7.1-0.20230811122637-4da7f5812480
@@ -26,7 +26,7 @@ require (
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/saltosystems/winrt-go v0.0.0-20230710111611-a39229b5054c // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
-	github.com/spf13/pflag v1.0.6 // indirect
+	github.com/spf13/pflag v1.0.9 // indirect
 	github.com/tinygo-org/cbgo v0.0.4 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
